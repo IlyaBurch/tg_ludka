@@ -18,4 +18,5 @@ jobs:
             cd ~/tg_ludka
             git pull origin main
             npm install --production
-            pm2 restart casino-bot
+            pm2 restart casino-bot || pm2 start src/index.js --name casino-bot
+            pm2 save
