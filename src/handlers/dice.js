@@ -66,7 +66,7 @@ module.exports = function (bot) {
     }
     stmts.updateSpins.run(player.free_spins, player.points, userId, chatId);
 
-    await sleep(3000);
+    await sleep(2500);
 
     const symbols = decodeSlots(ctx.message.dice.value);
     const { payout, jackpot } = calcWin(symbols);
