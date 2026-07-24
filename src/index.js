@@ -12,6 +12,15 @@ require("./handlers/dice")(bot);
 
 bot.catch((err) => console.error("Bot error:", err));
 
+bot.api.setMyCommands([
+  { command: "dep", description: "Регистрация в казино" },
+  { command: "balance", description: "Твой баланс" },
+  { command: "top", description: "Топ-10 игроков" },
+  { command: "dodep", description: "Додепнуть (поставить что-то)" },
+  { command: "rules", description: "Правила казино" },
+  { command: "help", description: "Помощь и правила" },
+]).catch((err) => console.error("Failed to set commands:", err));
+
 bot.start({
   onStart: () => console.log("Casino bot started 🎰"),
 });

@@ -57,12 +57,18 @@ module.exports = function (bot) {
     const { payout, jackpot } = calcWin(symbols);
     const symbolStr = symbols.join(" ");
 
+    function balanceStr() {
+      const parts = [`💰 ${player.points}`];
+      if (player.free_spins > 0) parts.push(`🎰 ${player.free_spins} фриспинов`);
+      return parts.join(" | ");
+    }
+
     if (payout > 0) {
       stmts.addWin.run(payout, payout, jackpot ? 1 : 0, userId, chatId);
-      const newBalance = player.points + payout;
+      player.points += payout;
       const msg = jackpot
-        ? `🎉 ОКУП! ${symbolStr} — +${payout} очков! Баланс: ${newBalance}`
-        : `Неплохо, ${symbolStr} — +${payout}. Баланс: ${newBalance}`;
+        ? `🎉 ОКУП! ${symbolStr} — +${payout} очков!\n${balanceStr()}`
+        : `Неплохо, ${symbolStr} — +${payout}.\n${balanceStr()}`;
 
       return ctx.reply(msg, {
         reply_parameters: { message_id: msgId },
@@ -73,7 +79,7 @@ module.exports = function (bot) {
     // loss
     stmts.addLoss.run(userId, chatId);
     const phrase = LOSS_PHRASES[Math.floor(Math.random() * LOSS_PHRASES.length)];
-    return ctx.reply(`${phrase} Баланс: ${player.points}`, {
+    return ctx.reply(`${phrase}\n${balanceStr()}`, {
       reply_parameters: { message_id: msgId },
       parse_mode: "HTML",
     });

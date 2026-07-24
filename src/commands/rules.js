@@ -1,5 +1,5 @@
 module.exports = function (bot) {
-  bot.command("rules", async (ctx) => {
+  bot.command(["rules", "help"], async (ctx) => {
     const text = `🎰 <b>ПРАВИЛА КАЗИНО</b> 🎰
 1 прокрут = 1 очко ставки
 
