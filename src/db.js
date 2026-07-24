@@ -41,7 +41,7 @@ const stmts = {
   addWin: db.prepare("UPDATE players SET points = points + ?, total_won = total_won + ?, jackpots = jackpots + ? WHERE user_id = ? AND chat_id = ?"),
   addDeposit: db.prepare("INSERT INTO deposits (user_id, chat_id, description, amount) VALUES (?, ?, ?, ?)"),
   addPoints: db.prepare("UPDATE players SET points = points + ? WHERE user_id = ? AND chat_id = ?"),
-  refreshDaily: db.prepare("UPDATE players SET free_spins = free_spins + 3, last_daily = ? WHERE user_id = ? AND chat_id = ?"),
+  refreshDaily: db.prepare("UPDATE players SET free_spins = free_spins + 5, last_daily = ? WHERE user_id = ? AND chat_id = ?"),
   addLoss: db.prepare("UPDATE players SET total_lost = total_lost + 1 WHERE user_id = ? AND chat_id = ?"),
   top10: db.prepare("SELECT username, first_name, points, jackpots FROM players WHERE chat_id = ? ORDER BY points DESC LIMIT 10"),
 };
@@ -52,7 +52,7 @@ function getOrRefreshPlayer(userId, chatId) {
   const today = new Date().toISOString().slice(0, 10);
   if (player.last_daily !== today) {
     stmts.refreshDaily.run(today, userId, chatId);
-    player.free_spins += 3;
+    player.free_spins += 5;
     player.last_daily = today;
   }
   return player;
