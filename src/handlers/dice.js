@@ -47,7 +47,6 @@ module.exports = function (bot) {
     if (!player) {
       try { await ctx.deleteMessage(); } catch { }
       return ctx.reply("Сначала зарегистрируйся через /dep, халявщик", {
-        reply_parameters: { message_id: msgId },
         parse_mode: "HTML",
       });
     }
@@ -55,7 +54,6 @@ module.exports = function (bot) {
     if (player.free_spins === 0 && player.points === 0) {
       try { await ctx.deleteMessage(); } catch { }
       return ctx.reply("У тебя 0 на счету, лудик. Сначала додепни через /dodep 🫠", {
-        reply_parameters: { message_id: msgId },
         parse_mode: "HTML",
       });
     }
