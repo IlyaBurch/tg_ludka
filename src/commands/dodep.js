@@ -1,4 +1,5 @@
 const { stmts, getOrRefreshPlayer } = require("../db");
+const tracker = require("../dodepTracker");
 
 const DODEP_AMOUNT = 5;
 
@@ -22,6 +23,7 @@ module.exports = function (bot) {
 
     stmts.addDeposit.run(ctx.from.id, ctx.chat.id, text, DODEP_AMOUNT);
     stmts.addPoints.run(DODEP_AMOUNT, ctx.from.id, ctx.chat.id);
+    tracker.start(ctx.from.id, ctx.chat.id, text);
 
     return ctx.reply(
       `Принято! Ты поставил <b>${text}</b>. Тебе начислено ${DODEP_AMOUNT} очков. Крути, лудик 🎰`,

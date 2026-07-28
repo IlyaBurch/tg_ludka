@@ -1,5 +1,16 @@
 const { stmts, getOrRefreshPlayer } = require("../db");
 const { decodeSlots, calcWin } = require("../slots");
+const tracker = require("../dodepTracker");
+
+const DODEP_LOSS_PHRASES = [
+  "поставил <b>%s</b> — и всё просрал. Классика лудомана 💀",
+  "додепнул <b>%s</b> и слил в ноль. Казино благодарит 🫡",
+  "<b>%s</b> — проиграно. Можешь забирать, уже не нужно.",
+  "5 из 5 мимо. <b>%s</b> улетает в трубу. Красиво жил 🫠",
+  "<b>%s</b> — официально потеряно. Соболезнуем. Или нет.",
+  "поставил <b>%s</b>, получил 5 проигрышей. Стабильность!",
+  "<b>%s</b> — всё, прощай. Даже рандом отвернулся.",
+];
 
 const LOSS_PHRASES = [
   "Лол, слил.",
@@ -78,7 +89,10 @@ module.exports = function (bot) {
       return parts.join(" | ");
     }
 
-    if (payout > 0) {
+    const won = payout > 0;
+    const lostStake = tracker.trackSpin(userId, chatId, won);
+
+    if (won) {
       stmts.addWin.run(payout, payout, jackpot ? 1 : 0, userId, chatId);
       player.points += payout;
       const msg = jackpot
@@ -94,7 +108,14 @@ module.exports = function (bot) {
     // loss
     stmts.addLoss.run(userId, chatId);
     const phrase = LOSS_PHRASES[Math.floor(Math.random() * LOSS_PHRASES.length)];
-    return ctx.reply(`${phrase}\n${balanceStr()}`, {
+    let text = `${phrase}\n${balanceStr()}`;
+
+    if (lostStake) {
+      const dp = DODEP_LOSS_PHRASES[Math.floor(Math.random() * DODEP_LOSS_PHRASES.length)];
+      text += `\n\n🚨 ${dp.replace("%s", lostStake)}`;
+    }
+
+    return ctx.reply(text, {
       reply_parameters: { message_id: msgId },
       parse_mode: "HTML",
     });
