@@ -1,7 +1,7 @@
 const { stmts, getOrRefreshPlayer } = require("../db");
 
 module.exports = function (bot) {
-  bot.command("dep", async (ctx) => {
+  bot.command("reg", async (ctx) => {
     const { id } = ctx.from;
     const chatId = ctx.chat.id;
     const existing = getOrRefreshPlayer(id, chatId);

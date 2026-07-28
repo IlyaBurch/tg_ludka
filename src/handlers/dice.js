@@ -1,6 +1,7 @@
 const { stmts, getOrRefreshPlayer } = require("../db");
 const { decodeSlots, calcWin } = require("../slots");
 const tracker = require("../dodepTracker");
+const { takeBet } = require("../betTracker");
 
 const DODEP_LOSS_PHRASES = [
   "поставил <b>%s</b> — и всё просрал. Классика лудомана 💀",
@@ -57,7 +58,7 @@ module.exports = function (bot) {
 
     if (!player) {
       try { await ctx.deleteMessage(); } catch { }
-      return ctx.reply("Сначала зарегистрируйся через /dep, халявщик", {
+      return ctx.reply("Сначала зарегистрируйся через /reg, халявщик", {
         parse_mode: "HTML",
       });
     }
@@ -69,8 +70,20 @@ module.exports = function (bot) {
       });
     }
 
-    // deduct 1 spin
-    if (player.free_spins > 0) {
+    // check for a bet from /dep
+    const bet = takeBet(userId, chatId);
+    const cost = bet || 1;
+
+    // deduct cost
+    if (bet) {
+      if (player.points < bet) {
+        return ctx.reply(`У тебя ${player.points} очков — не хватает на ставку ${bet} 🫠`, {
+          reply_parameters: { message_id: msgId },
+          parse_mode: "HTML",
+        });
+      }
+      player.points -= bet;
+    } else if (player.free_spins > 0) {
       player.free_spins -= 1;
     } else {
       player.points -= 1;
@@ -80,7 +93,8 @@ module.exports = function (bot) {
     await sleep(1600);
 
     const symbols = decodeSlots(ctx.message.dice.value);
-    const { payout, jackpot } = calcWin(symbols);
+    const { payout: basePayout, jackpot } = calcWin(symbols);
+    const payout = basePayout * cost;
     const symbolStr = symbols.join(" ");
 
     function balanceStr() {
@@ -95,9 +109,10 @@ module.exports = function (bot) {
     if (won) {
       stmts.addWin.run(payout, payout, jackpot ? 1 : 0, userId, chatId);
       player.points += payout;
+      const betNote = bet ? ` (ставка ×${cost})` : "";
       const msg = jackpot
-        ? `🎉 ОКУП! ${symbolStr} — +${payout} очков!\n${balanceStr()}`
-        : `Неплохо, ${symbolStr} — +${payout}.\n${balanceStr()}`;
+        ? `🎉 ОКУП! ${symbolStr} — +${payout} очков${betNote}!\n${balanceStr()}`
+        : `Неплохо, ${symbolStr} — +${payout}${betNote}.\n${balanceStr()}`;
 
       return ctx.reply(msg, {
         reply_parameters: { message_id: msgId },
@@ -108,7 +123,8 @@ module.exports = function (bot) {
     // loss
     stmts.addLoss.run(userId, chatId);
     const phrase = LOSS_PHRASES[Math.floor(Math.random() * LOSS_PHRASES.length)];
-    let text = `${phrase}\n${balanceStr()}`;
+    const betNote = bet ? ` (ставка ${cost})` : "";
+    let text = `${phrase}${betNote}\n${balanceStr()}`;
 
     if (lostStake) {
       const dp = DODEP_LOSS_PHRASES[Math.floor(Math.random() * DODEP_LOSS_PHRASES.length)];
