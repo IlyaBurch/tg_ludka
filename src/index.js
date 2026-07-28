@@ -11,6 +11,15 @@ require("./commands/dodep")(bot);
 require("./commands/rules")(bot);
 require("./handlers/dice")(bot);
 
+bot.command("topicid", async (ctx) => {
+  const threadId = ctx.message.message_thread_id;
+  const chatId = ctx.chat.id;
+  await ctx.reply(`chat_id: <code>${chatId}</code>\nmessage_thread_id: <code>${threadId || "нет (не топик)"}</code>`, {
+    reply_parameters: { message_id: ctx.message.message_id },
+    parse_mode: "HTML",
+  });
+});
+
 bot.catch((err) => console.error("Bot error:", err));
 
 bot.api.setMyCommands([
