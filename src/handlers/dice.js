@@ -50,6 +50,16 @@ module.exports = function (bot) {
     if (ctx.message.dice.emoji !== "🎰") return;
     if (ctx.chat.type === "private") return;
 
+    const forumChatId = process.env.FORUM_CHAT_ID ? Number(process.env.FORUM_CHAT_ID) : null;
+    const forumThreadId = process.env.FORUM_THREAD_ID ? Number(process.env.FORUM_THREAD_ID) : null;
+
+    if (forumChatId && ctx.chat.id === forumChatId) {
+      if (ctx.message.message_thread_id !== forumThreadId) {
+        try { await ctx.deleteMessage(); } catch {}
+        return;
+      }
+    }
+
     const userId = ctx.from.id;
     const chatId = ctx.chat.id;
     const msgId = ctx.message.message_id;
