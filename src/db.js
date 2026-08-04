@@ -43,6 +43,8 @@ const stmts = {
   addPoints: db.prepare("UPDATE players SET points = points + ? WHERE user_id = ? AND chat_id = ?"),
   refreshDaily: db.prepare("UPDATE players SET free_spins = free_spins + 5, last_daily = ? WHERE user_id = ? AND chat_id = ?"),
   addLoss: db.prepare("UPDATE players SET total_lost = total_lost + 1 WHERE user_id = ? AND chat_id = ?"),
+  resetPlayer: db.prepare("UPDATE players SET points = 0, free_spins = 0, total_won = 0, total_lost = 0, jackpots = 0 WHERE user_id = ? AND chat_id = ?"),
+  setPoints: db.prepare("UPDATE players SET points = ? WHERE user_id = ? AND chat_id = ?"),
   top10: db.prepare("SELECT username, first_name, points, jackpots FROM players WHERE chat_id = ? ORDER BY points DESC LIMIT 10"),
 };
 
