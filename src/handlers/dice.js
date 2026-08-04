@@ -49,6 +49,7 @@ module.exports = function (bot) {
   bot.on("message:dice", async (ctx) => {
     if (ctx.message.dice.emoji !== "🎰") return;
     if (ctx.chat.type === "private") return;
+    if (ctx.message.forward_origin || ctx.message.forward_date) return;
 
     const forumChatId = process.env.FORUM_CHAT_ID ? Number(process.env.FORUM_CHAT_ID) : null;
     const forumThreadId = process.env.FORUM_THREAD_ID ? Number(process.env.FORUM_THREAD_ID) : null;

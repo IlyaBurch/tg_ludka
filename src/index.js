@@ -9,6 +9,8 @@ require("./commands/balance")(bot);
 require("./commands/top")(bot);
 require("./commands/dodep")(bot);
 require("./commands/rules")(bot);
+require("./commands/reset")(bot);
+require("./commands/setpoints")(bot);
 require("./handlers/dice")(bot);
 
 bot.command("topicid", async (ctx) => {
@@ -29,6 +31,7 @@ bot.api.setMyCommands([
   { command: "top", description: "Топ-10 игроков" },
   { command: "dodep", description: "Додепнуть (поставить что-то)" },
   { command: "rules", description: "Правила казино" },
+  { command: "reset", description: "Обнулить игрока (админ)" },
   { command: "help", description: "Помощь и правила" },
 ]).catch((err) => console.error("Failed to set commands:", err));
 
