@@ -19,7 +19,6 @@ const LOSS_PHRASES = [
   "Мимо кассы, лудик.",
   "Даже бабушка крутит лучше.",
   "Ты точно не мог просто деньги на ветер выкинуть?",
-  "Казино благодарит за донат.",
   "💀",
   "Лудоман в минусе, классика.",
   "Ты крутишь как мой дед — без результата.",
@@ -56,7 +55,7 @@ module.exports = function (bot) {
 
     if (forumChatId && ctx.chat.id === forumChatId) {
       if (ctx.message.message_thread_id !== forumThreadId) {
-        try { await ctx.deleteMessage(); } catch {}
+        try { await ctx.deleteMessage(); } catch { }
         return;
       }
     }
